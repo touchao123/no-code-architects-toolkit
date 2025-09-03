@@ -21,21 +21,16 @@ escape_json() {
 CMD="docker run -p 8080:8080"
 
 # Add environment variables from JSON
-for key in $(echo "$VARS" | jq -r 'keys[]'); do
-    value=$(echo "$VARS" | jq -r --arg k "$key" '.[$k]')
-    
-    # Handle nested JSON (specifically for GCP_SA_CREDENTIALS)
-    if [[ "$key" == "GCP_SA_CREDENTIALS" ]]; then
-        value=$(echo "$VARS" | jq -r --arg k "$key" '.[$k]')
-        value=$(escape_json "$value")
-    fi
-    
-    CMD="$CMD -e $key=\"$value\""
-done
+while IFS='=' read -r key value; do
+  # 添加环境变量到 Docker 命令
+  CMD="$CMD -e \"$key=$value\""
+  echo "$key = $value"
+done < <(jq -r 'to_entries | .[] | "\(.key)=\(.value|tostring)"' .env_variables.json)
 
 # Complete the command
 CMD="$CMD no-code-architects-toolkit:testing"
 
 # Run the Docker container
 echo "Running Docker container..."
+echo "$CMD"
 eval "$CMD"
