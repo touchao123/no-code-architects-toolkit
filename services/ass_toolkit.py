@@ -169,6 +169,7 @@ def download_captions(captions_url):
         logger.info(f"Downloading captions from URL: {captions_url}")
         response = requests.get(captions_url)
         response.raise_for_status()
+        response.encoding = 'utf-8' 
         logger.info("Captions downloaded successfully.")
         return response.text
     except Exception as e:
@@ -773,7 +774,10 @@ def generate_ass_captions_v1(video_url, captions, settings, replace, exclude_tim
             style_options['word_color'] = style_options.pop('highlight_color')
 
         # Check font availability
-        font_family = style_options.get('font_family', 'Arial')
+        font_family = style_options.get('font_family')
+        if not font_family:
+            font_family = 'Arial'  # Fallback to Arial if no font_family is provided
+
         available_fonts = get_available_fonts()
         if font_family not in available_fonts:
             logger.warning(f"Job {job_id}: Font '{font_family}' not found.")

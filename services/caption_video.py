@@ -80,7 +80,7 @@ def generate_style_line(options):
     """Generate ASS style line from options."""
     style_options = {
         'Name': 'Default',
-        'Fontname': options.get('font_name', 'Arial'),
+        'Fontname': options.get('font_name'),
         'Fontsize': options.get('font_size', 12),
         'PrimaryColour': options.get('primary_color', '&H00FFFFFF'),
         'OutlineColour': options.get('outline_color', '&H00000000'),
@@ -154,7 +154,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         logger.info(f"Job {job_id}: Output path set to {output_path}")
 
         # Ensure font_name is converted to the full font path
-        font_name = options.get('font_name', 'Arial')
+        font_name = options.get('font_name')
+        if not font_name:
+            font_name = 'Arial'
+
         if font_name in FONT_PATHS:
             selected_font = FONT_PATHS[font_name]
             logger.info(f"Job {job_id}: Font path set to {selected_font}")
